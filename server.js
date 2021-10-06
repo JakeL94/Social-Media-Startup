@@ -1,4 +1,3 @@
-const e = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -10,11 +9,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 app.use(require('./routes'));
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/Social-Media-Startup', {
-  useFindAndModify: false,
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+// don't need options here because mongoose is in version 6+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/Social-Media-Startup');
 
 mongoose.set('debug', true);
 
