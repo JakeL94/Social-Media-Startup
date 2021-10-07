@@ -1,7 +1,7 @@
 const { User } = require('../models');
 
 const userController = {
-  getAllUser(req, res) {
+  getAllUsers(req, res) {
     User.find({})
       .then(dbUserData => res.json(dbUserData))
       .catch( err => {
@@ -26,7 +26,7 @@ const userController = {
   },
 
   createNewUser({body}, res) {
-    User.Create(body)
+    User.create(body)
       .then(dbUserData => 
         res.json(dbUserData))
       .catch(err => 
@@ -57,11 +57,11 @@ const userController = {
     .catch(err => res.status(400).json(err));
   },
 
-  addFriend({params, body}, res) {
-    User.findOneAndUpdate({ _id: params.id }, body, {new: true})
+  addFriend({params}, res) {
+    User.findOneAndUpdate({ _id: params.id }, {$addToSet: {userFriends: params.id}}, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
-          res.status(404).json({ mesage:'Wrong User'});
+          res.status(404).json({ message:'Wrong User'});
           return;
         }
         res.json(dbUserData);
@@ -70,7 +70,15 @@ const userController = {
   },
 
   removeFriend({params}, res) {
-
+    User.findOneAndUpdate({ _id: params.id }, {$pull: {userFriends: params.id}}, {new: true})
+      .then(dbUserData => {
+        if (!dbUserData) {
+          res.status(404).json({ message:'Wrong User'});
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch(err => res.status(400).json(err));
   }
 }
 

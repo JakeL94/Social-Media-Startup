@@ -61,7 +61,7 @@ const thoughtController = {
 
   },
 
-  removeFriend({params}, res) {
+  removeReaction({params}, res) {
 
   }
 }
