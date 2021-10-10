@@ -49,7 +49,7 @@ const thoughtController = {
     Thought.findOneAndDelete({ _id: params.id }, body, {new:true})
       .then(dbUserData => {
         if (!dbUserData) {
-          res.status(404).json({ mesage:'Cannot fetch the current thought'});
+          res.status(404).json({ mesage:'Cannot think the current thought'});
           return;
         }
         res.json(dbUserData);
@@ -58,12 +58,29 @@ const thoughtController = {
   },
 
   addReaction({params}, res) {
-
+    User.findOneAndUpdate({ _id: params.id }, {$addToSet: {userReactions: params.id}}, {new: true})
+      .then(dbUserData => {
+        if (!dbUserData) {
+          res.status(404).json({ message:'No reaction found'});
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch(err => res.status(400).json(err));
   },
 
-  removeReaction({params}, res) {
-
+  removeFriend({params}, res) {
+    User.findOneAndUpdate({ _id: params.id }, {$pull: {userReactions: params.id}}, {new: true})
+      .then(dbUserData => {
+        if (!dbUserData) {
+          res.status(404).json({ message:'No reaction found'});
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch(err => res.status(400).json(err));
   }
 }
+
 
 module.exports = thoughtController;
