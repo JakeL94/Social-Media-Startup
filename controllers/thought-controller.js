@@ -2,7 +2,7 @@ const { Thought } = require('../models');
 
 const thoughtController = {
   getAllThoughts(req, res) {
-    Thought.find({})
+    Thought.find()
       .then(dbThoughtData => res.json(dbThoughtData))
       .catch( err => {
       console.log(err);
@@ -10,18 +10,18 @@ const thoughtController = {
     });
   },
 
-  getThoughtByID({params}, res) {
-    Thought.findOne({ _id: params.id })
+  getThoughtByID(req, res) {
+    Thought.findOne({ _id: req.params.thoughtId })
     .then(dbThoughtData => {
       if (!dbThoughtData) {
         res.status(404).json({ message: 'Thought unable to be retreived' });
-        return;
+        // return;
       }
       res.json(dbThoughtData);
     })
     .catch(err => {
       console.log(err);
-      res.status(400).json(err);
+      res.status(500).json(err);
     });
   },
 
@@ -34,7 +34,7 @@ const thoughtController = {
   },
 
   updateThought({params, body}, res) {
-    Thought.findOneAndUpdate({ _id: params.id }, body, {new:true})
+    Thought.findOneAndUpdate({ _id: params.thoughtId }, body, {new:true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ mesage:'Thought could not be translated'});
@@ -46,7 +46,7 @@ const thoughtController = {
   },
 
   deleteThought({params}, res) {
-    Thought.findOneAndDelete({ _id: params.id }, body, {new:true})
+    Thought.findOneAndDelete({ _id: params.thoughtId }, {new:true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ mesage:'Cannot think the current thought'});
@@ -58,7 +58,7 @@ const thoughtController = {
   },
 
   addReaction({params}, res) {
-    User.findOneAndUpdate({ _id: params.id }, {$addToSet: {userReactions: params.id}}, {new: true})
+    Thought.findOneAndUpdate({ _id: params.thoughtId }, {$addToSet: {userReactions: params.reactionId}}, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message:'No reaction found'});
@@ -69,8 +69,8 @@ const thoughtController = {
       .catch(err => res.status(400).json(err));
   },
 
-  removeFriend({params}, res) {
-    User.findOneAndUpdate({ _id: params.id }, {$pull: {userReactions: params.id}}, {new: true})
+  removeReaction({params}, res) {
+    Thought.findOneAndUpdate({ _id: params.thoughtId }, {$pull: {userReactions: params.reactionId}}, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message:'No reaction found'});

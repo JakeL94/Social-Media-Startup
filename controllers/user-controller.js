@@ -1,8 +1,9 @@
 const { User } = require('../models');
 
 const userController = {
+  // works
   getAllUsers(req, res) {
-    User.find({})
+    User.find()
       .then(dbUserData => res.json(dbUserData))
       .catch( err => {
         console.log(err);
@@ -10,21 +11,24 @@ const userController = {
       });
   },
 
-  getUserByID({params}, res) {
-    User.findOne({ _id: params.id })
+  getUserByID(req, res) {
+    User.findOne({ _id: req.params.userId })
+    .populate('userThoughts')
+    .populate('userFriends')
+    .select('-__v')
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message: 'User not found' });
-          return;
         }
         res.json(dbUserData);
       })
       .catch(err => {
         console.log(err);
-        res.status(400).json(err);
+        res.status(500).json(err);
       });
   },
 
+  // works
   createNewUser({body}, res) {
     User.create(body)
       .then(dbUserData => 
@@ -34,7 +38,7 @@ const userController = {
   },
 
   updateUser({params, body}, res) {
-    User.findOneAndUpdate({ _id: params.id }, body, {new: true})
+    User.findOneAndUpdate({ _id: params.userId }, body, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ mesage:'Unable to find User'});
@@ -46,7 +50,7 @@ const userController = {
   },
 
   deleteUser({params}, res) {
-    User.findOneAndDelete({ _id: params.id })
+    User.findOneAndDelete({ _id: params.userId })
     .then(dbUserData => {
       if (!dbUserData) {
         res.status(404).json({ message:'Sorry User does not exist'});
@@ -58,7 +62,7 @@ const userController = {
   },
 
   addFriend({params}, res) {
-    User.findOneAndUpdate({ _id: params.id }, {$addToSet: {userFriends: params.id}}, {new: true})
+    User.findOneAndUpdate({ _id: params.userId }, {$addToSet: {userFriends: params.friendId}}, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message:'Wrong User'});
@@ -70,7 +74,7 @@ const userController = {
   },
 
   removeFriend({params}, res) {
-    User.findOneAndUpdate({ _id: params.id }, {$pull: {userFriends: params.id}}, {new: true})
+    User.findOneAndUpdate({ _id: params.userId }, {$pull: {userFriends: params.friendId}}, {new: true})
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message:'Wrong User'});

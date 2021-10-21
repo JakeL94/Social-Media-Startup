@@ -36,11 +36,11 @@ const ThoughtModel = new Schema(
       required: true,
       maxlength: 280
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      get: (createdAtVal) => dateFormat(createdAtVal)
-    },
+    // createdAt: {
+    //   type: Date,
+    //   default: Date.now,
+    //   get: (createdAtVal) => dateFormat(createdAtVal)
+    // },
     username: {
       type: String,
       required: true
@@ -57,7 +57,7 @@ const ThoughtModel = new Schema(
 );
 
 ThoughtModel.virtual('reactions').get(function() {
-  return this.reactions.length;
+  return this.userFriends.length;
 });
 
 const Thought = model('Thought', ThoughtModel);
